@@ -82,16 +82,16 @@ class ModelFileManager:
         @routes.post("/download_model")
         async def post_download_model(request):
             if not self.is_download_model_enabled():
-                print("Download Model endpoint is disabled")
+                logging.error("Download Model endpoint is disabled")
                 return web.Response(status=403)
             json_data = await request.json()
             url = json_data.get("url", None)
             if url is None:
-                print("URL is not provided")
+                logging.error("URL is not provided")
                 return web.Response(status=401)
             save_dir = json_data.get("save_dir", None)
             if save_dir not in folder_paths.folder_names_and_paths:
-                print("Save directory is not valid")
+                logging.error("Save directory is not valid")
                 return web.Response(status=401)
             filename = json_data.get("filename", url.split("/")[-1])
             token = json_data.get("token", None)
@@ -113,7 +113,7 @@ class ModelFileManager:
                 os.rename(tmp_path, save_path)
                 return web.Response(status=200)
             except Exception as e:
-                print(f"Failed to download model: {e}")
+                logging.error(f"Failed to download model: {e}")
                 if os.path.exists(tmp_path):
                     os.remove(tmp_path)
                 return web.Response(status=500)
